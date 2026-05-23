@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Calculate Shopee voucher discounts on item cost to maintain profit. All values in Malaysian Ringgit (RM).">
+  <meta name="theme-color" content="#0f172a">
+  <title>Shopee Voucher Profit Calculator | RM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 font-sans text-slate-800 antialiased">
+
+  <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
+
+    <header class="mb-8 text-center sm:mb-10">
+      <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-slate-500 shadow-sm backdrop-blur">
+        <span class="h-2 w-2 rounded-full bg-orange-500"></span>
+        Shopee Voucher · Malaysian Ringgit (RM)
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+        Voucher Profit Calculator
+      </h1>
+      <p class="mx-auto mt-3 max-w-xl text-sm text-slate-500 sm:text-base">
+        Voucher discount applies to your <strong class="font-medium text-slate-700">cost price</strong>, not your selling price. See how much Shopee voucher you can use and still profit.
+      </p>
+    </header>
+
+    <main class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-200/50">
+
+      <section class="border-b border-slate-100 p-6 sm:p-8">
+        <h2 class="mb-6 flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <svg class="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+          Calculator
+        </h2>
+
+        <div class="mb-6 rounded-xl border border-indigo-100 bg-indigo-50/60 px-4 py-3 text-sm text-indigo-900">
+          <span class="font-semibold">Formula:</span>
+          Actual Cost = Cost × (1 − Voucher %)
+          &nbsp;→&nbsp;
+          Profit = Selling Price − Actual Cost
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+
+          <div class="space-y-5">
+            <div>
+              <label for="costPrice" class="mb-1.5 block text-sm font-medium text-slate-700">
+                Cost Price (RM)
+              </label>
+              <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-medium text-slate-400">RM</span>
+                <input
+                  type="number"
+                  id="costPrice"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-base font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                >
+              </div>
+              <p class="mt-1 text-xs text-slate-400">Item cost (x) — voucher discount is applied here</p>
+            </div>
+
+            <div>
+              <label for="sellingPrice" class="mb-1.5 block text-sm font-medium text-slate-700">
+                Selling Price (RM)
+              </label>
+              <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-medium text-slate-400">RM</span>
+                <input
+                  type="number"
+                  id="sellingPrice"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-base font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                >
+              </div>
+              <p class="mt-1 text-xs text-slate-400">Your Shopee listing price — no discount on this</p>
+            </div>
+
+            <div>
+              <label for="voucherDiscount" class="mb-1.5 block text-sm font-medium text-slate-700">
+                Shopee Voucher Discount
+              </label>
+              <div class="flex gap-2">
+                <div class="relative min-w-0 flex-1">
+                  <span id="discountPrefix" class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-medium text-slate-400">%</span>
+                  <input
+                    type="number"
+                    id="voucherDiscount"
+                    min="0"
+                    step="0.01"
+                    placeholder="0"
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-base font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  >
+                </div>
+                <div class="inline-flex shrink-0 rounded-xl border border-slate-200 bg-slate-50 p-1">
+                  <button
+                    type="button"
+                    id="btnPercent"
+                    class="rounded-lg px-3 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm bg-indigo-600 text-white shadow-sm"
+                    aria-pressed="true"
+                  >%</button>
+                  <button
+                    type="button"
+                    id="btnFlat"
+                    class="rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition hover:text-slate-900 sm:px-4 sm:text-sm"
+                    aria-pressed="false"
+                  >RM</button>
+                </div>
+              </div>
+              <p class="mt-1 text-xs text-slate-400">Test a voucher — reduces your cost, not the selling price</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col justify-center">
+            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-white p-5 sm:p-6">
+              <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">Live Results</h3>
+
+              <div class="space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                  <span class="text-sm text-slate-600">Actual Cost (RM)</span>
+                  <span id="actualCost" class="text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">RM 0.00</span>
+                </div>
+                <p id="actualCostFormula" class="-mt-2 text-xs text-slate-400">Cost after voucher is applied</p>
+
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4 pt-1">
+                  <span class="text-sm text-slate-600">Net Profit / Loss (RM)</span>
+                  <span id="netProfit" class="text-xl font-bold tabular-nums text-slate-400 sm:text-2xl">RM 0.00</span>
+                </div>
+                <p class="-mt-2 text-xs text-slate-400">Selling Price − Actual Cost</p>
+
+                <div class="flex items-center justify-between pt-1">
+                  <span class="text-sm text-slate-600">Profit Margin (%)</span>
+                  <span id="profitMargin" class="text-xl font-bold tabular-nums text-slate-400 sm:text-2xl">0.00%</span>
+                </div>
+                <p class="-mt-2 text-xs text-slate-400">Based on your fixed selling price</p>
+              </div>
+
+              <div id="statusBanner" class="mt-5 hidden rounded-xl px-4 py-3 text-sm font-medium"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-slate-50/50 p-6 sm:p-8">
+        <h2 class="mb-2 flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <svg class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Voucher Cheat Sheets
+        </h2>
+        <p class="mb-6 text-sm text-slate-500">
+          Left: profit at each voucher %. Right: voucher % needed to hit a target profit.
+        </p>
+
+        <div class="grid gap-6 xl:grid-cols-2">
+
+          <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-100 bg-white px-4 py-3 sm:px-5">
+              <h3 class="text-sm font-semibold text-slate-800">Percentage Voucher Matrix</h3>
+              <p class="text-xs text-slate-400">18% to 30% off cost · Actual Cost = Cost × (1 − %)</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[320px] text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-100 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                    <th class="px-4 py-2.5 font-semibold sm:px-5">Voucher (%)</th>
+                    <th class="px-4 py-2.5 font-semibold sm:px-5">Actual Cost (RM)</th>
+                    <th class="px-4 py-2.5 font-semibold sm:px-5">Profit/Loss (RM)</th>
+                    <th class="px-4 py-2.5 font-semibold sm:px-5">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="percentTableBody" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-100 bg-white px-4 py-3 sm:px-5">
+              <h3 class="text-sm font-semibold text-slate-800">Target Profit → Voucher Matrix</h3>
+              <p class="text-xs text-slate-400">RM 1 to RM 20 target profit · voucher % needed off cost</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[320px] text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-100 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                    <th class="px-4 py-2.5 font-semibold sm:px-5">Target Profit (RM)</th>
+                    <th class="px-4 py-2.5 font-semibold sm:px-5">Voucher Needed (%)</th>
+                    <th class="px-4 py-2.5 font-semibold sm:px-5">Actual Cost (RM)</th>
+                    <th class="px-4 py-2.5 font-semibold sm:px-5">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="targetProfitTableBody" class="divide-y divide-slate-50"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-8 text-center text-xs text-slate-400">
+      Actual Cost = Cost × (1 − Voucher %) &nbsp;·&nbsp; Profit = Selling Price − Actual Cost &nbsp;·&nbsp; Margin = (Profit ÷ Selling Price) × 100
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const costPriceEl = document.getElementById('costPrice');
+      const sellingPriceEl = document.getElementById('sellingPrice');
+      const voucherDiscountEl = document.getElementById('voucherDiscount');
+      const btnPercent = document.getElementById('btnPercent');
+      const btnFlat = document.getElementById('btnFlat');
+      const discountPrefix = document.getElementById('discountPrefix');
+      const actualCostEl = document.getElementById('actualCost');
+      const actualCostFormulaEl = document.getElementById('actualCostFormula');
+      const netProfitEl = document.getElementById('netProfit');
+      const profitMarginEl = document.getElementById('profitMargin');
+      const statusBanner = document.getElementById('statusBanner');
+      const percentTableBody = document.getElementById('percentTableBody');
+      const targetProfitTableBody = document.getElementById('targetProfitTableBody');
+
+      let discountMode = 'percent';
+
+      function parseNum(value) {
+        const n = parseFloat(value);
+        return isNaN(n) ? 0 : Math.max(0, n);
+      }
+
+      function fmtRM(amount) {
+        return 'RM ' + amount.toFixed(2);
+      }
+
+      function calcActualCost(costPrice, voucher, mode) {
+        if (mode === 'percent') {
+          const pct = Math.min(voucher, 100);
+          return Math.max(0, costPrice * (1 - pct / 100));
+        }
+        return Math.max(0, costPrice - voucher);
+      }
+
+      function calcProfit(sellingPrice, costPrice, voucher, mode) {
+        const actualCost = calcActualCost(costPrice, voucher, mode);
+        const profit = sellingPrice - actualCost;
+        const margin = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
+        return { actualCost, profit, margin };
+      }
+
+      function statusBadge(isPass) {
+        if (isPass) {
+          return '<span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Pass</span>';
+        }
+        return '<span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-800 ring-1 ring-inset ring-red-600/20">Fail</span>';
+      }
+
+      function profitCellClass(profit) {
+        return profit > 0 ? 'text-emerald-600 font-medium' : profit < 0 ? 'text-red-800 font-medium' : 'text-slate-500';
+      }
+
+      function setProfitColors(profit) {
+        netProfitEl.classList.remove('text-emerald-600', 'text-red-800', 'text-slate-400');
+        profitMarginEl.classList.remove('text-emerald-600', 'text-red-800', 'text-slate-400');
+
+        if (profit > 0) {
+          netProfitEl.classList.add('text-emerald-600');
+          profitMarginEl.classList.add('text-emerald-600');
+        } else if (profit < 0) {
+          netProfitEl.classList.add('text-red-800');
+          profitMarginEl.classList.add('text-red-800');
+        } else {
+          netProfitEl.classList.add('text-slate-400');
+          profitMarginEl.classList.add('text-slate-400');
+        }
+      }
+
+      function breakEvenVoucher(costPrice, sellingPrice) {
+        if (costPrice <= 0) return { pct: 0, flat: 0 };
+        const pct = sellingPrice >= costPrice ? 0 : ((1 - sellingPrice / costPrice) * 100);
+        const flat = Math.max(0, costPrice - sellingPrice);
+        return { pct: Math.min(100, Math.max(0, pct)), flat };
+      }
+
+      function updateStatusBanner(profit, costPrice, sellingPrice, voucher, mode) {
+        if (costPrice <= 0 || sellingPrice <= 0) {
+          statusBanner.classList.add('hidden');
+          return;
+        }
+
+        statusBanner.classList.remove('hidden');
+        const be = breakEvenVoucher(costPrice, sellingPrice);
+
+        if (profit > 0) {
+          statusBanner.className = 'mt-5 rounded-xl px-4 py-3 text-sm font-medium bg-emerald-50 text-emerald-800 border border-emerald-100';
+          if (sellingPrice >= costPrice) {
+            statusBanner.textContent =
+              'Profitable! Your selling price already exceeds cost. This voucher saves you even more.';
+          } else {
+            statusBanner.textContent =
+              'Profitable with this voucher. Minimum to break even: ' + be.pct.toFixed(2) + '% or RM ' + be.flat.toFixed(2) + ' off cost.';
+          }
+        } else if (profit < 0) {
+          statusBanner.className = 'mt-5 rounded-xl px-4 py-3 text-sm font-medium bg-red-50 text-red-800 border border-red-100';
+          statusBanner.textContent =
+            'Loss at this voucher level. You need at least ' + be.pct.toFixed(2) + '% or RM ' + be.flat.toFixed(2) + ' off cost to break even.';
+        } else {
+          statusBanner.className = 'mt-5 rounded-xl px-4 py-3 text-sm font-medium bg-amber-50 text-amber-800 border border-amber-100';
+          statusBanner.textContent = 'Break-even — selling price equals actual cost after voucher.';
+        }
+      }
+
+      function updateActualCostFormula(costPrice, voucher, mode) {
+        if (costPrice <= 0) {
+          actualCostFormulaEl.textContent = 'Cost after voucher is applied';
+          return;
+        }
+        if (mode === 'percent') {
+          const pct = Math.min(voucher, 100);
+          actualCostFormulaEl.textContent =
+            fmtRM(costPrice) + ' × (1 − ' + pct.toFixed(2) + '%) = ' + fmtRM(calcActualCost(costPrice, voucher, mode));
+        } else {
+          actualCostFormulaEl.textContent =
+            fmtRM(costPrice) + ' − RM ' + voucher.toFixed(2) + ' = ' + fmtRM(calcActualCost(costPrice, voucher, mode));
+        }
+      }
+
+      function calcRequiredVoucher(costPrice, sellingPrice, targetProfit) {
+        if (costPrice <= 0 || sellingPrice <= 0) {
+          return { pctNeeded: 0, actualCost: 0, pass: false, noVoucherNeeded: false };
+        }
+
+        const raw = costPrice - sellingPrice + targetProfit;
+        const pctNeeded = (raw / costPrice) * 100;
+
+        if (targetProfit > sellingPrice) {
+          return { pctNeeded, actualCost: 0, pass: false, noVoucherNeeded: false };
+        }
+
+        if (raw <= 0) {
+          const profitWithoutVoucher = sellingPrice - costPrice;
+          return {
+            pctNeeded: 0,
+            actualCost: costPrice,
+            pass: profitWithoutVoucher >= targetProfit,
+            noVoucherNeeded: true,
+          };
+        }
+
+        if (raw > costPrice) {
+          return { pctNeeded, actualCost: 0, pass: false, noVoucherNeeded: false };
+        }
+
+        return {
+          pctNeeded,
+          actualCost: costPrice * (1 - pctNeeded / 100),
+          pass: true,
+          noVoucherNeeded: false,
+        };
+      }
+
+      function buildPercentTable(costPrice, sellingPrice) {
+        let rows = '';
+        for (let pct = 18; pct <= 30; pct++) {
+          const { actualCost, profit } = calcProfit(sellingPrice, costPrice, pct, 'percent');
+          rows += '<tr class="hover:bg-slate-50/80 transition-colors">' +
+            '<td class="px-4 py-2 tabular-nums text-slate-700 sm:px-5">' + pct + '%</td>' +
+            '<td class="px-4 py-2 tabular-nums text-slate-700 sm:px-5">' + fmtRM(actualCost) + '</td>' +
+            '<td class="px-4 py-2 tabular-nums sm:px-5 ' + profitCellClass(profit) + '">' + fmtRM(profit) + '</td>' +
+            '<td class="px-4 py-2 sm:px-5">' + statusBadge(profit > 0) + '</td>' +
+            '</tr>';
+        }
+        percentTableBody.innerHTML = rows;
+      }
+
+      function buildTargetProfitTable(costPrice, sellingPrice) {
+        let rows = '';
+        for (let target = 1; target <= 20; target++) {
+          const result = calcRequiredVoucher(costPrice, sellingPrice, target);
+          let voucherDisplay;
+          if (result.noVoucherNeeded) {
+            voucherDisplay = '<span class="text-slate-400">None</span>';
+          } else if (!result.pass) {
+            voucherDisplay = '<span class="text-red-800 font-medium">' + result.pctNeeded.toFixed(2) + '%</span>';
+          } else {
+            voucherDisplay = '<span class="text-emerald-600 font-medium">' + result.pctNeeded.toFixed(2) + '%</span>';
+          }
+
+          const actualCostDisplay = result.pass || result.noVoucherNeeded
+            ? fmtRM(result.actualCost)
+            : '<span class="text-slate-400">—</span>';
+
+          rows += '<tr class="hover:bg-slate-50/80 transition-colors">' +
+            '<td class="px-4 py-2 tabular-nums text-slate-700 sm:px-5">' + fmtRM(target) + '</td>' +
+            '<td class="px-4 py-2 tabular-nums sm:px-5">' + voucherDisplay + '</td>' +
+            '<td class="px-4 py-2 tabular-nums text-slate-700 sm:px-5">' + actualCostDisplay + '</td>' +
+            '<td class="px-4 py-2 sm:px-5">' + statusBadge(result.pass) + '</td>' +
+            '</tr>';
+        }
+        targetProfitTableBody.innerHTML = rows;
+      }
+
+      function updateCalculator() {
+        const costPrice = parseNum(costPriceEl.value);
+        const sellingPrice = parseNum(sellingPriceEl.value);
+        const voucher = parseNum(voucherDiscountEl.value);
+
+        const { actualCost, profit, margin } = calcProfit(sellingPrice, costPrice, voucher, discountMode);
+
+        actualCostEl.textContent = fmtRM(actualCost);
+        netProfitEl.textContent = fmtRM(profit);
+        profitMarginEl.textContent = margin.toFixed(2) + '%';
+
+        updateActualCostFormula(costPrice, voucher, discountMode);
+        setProfitColors(profit);
+        updateStatusBanner(profit, costPrice, sellingPrice, voucher, discountMode);
+        buildPercentTable(costPrice, sellingPrice);
+        buildTargetProfitTable(costPrice, sellingPrice);
+      }
+
+      function setDiscountMode(mode) {
+        discountMode = mode;
+        const isPercent = mode === 'percent';
+
+        btnPercent.classList.toggle('bg-indigo-600', isPercent);
+        btnPercent.classList.toggle('text-white', isPercent);
+        btnPercent.classList.toggle('shadow-sm', isPercent);
+        btnPercent.classList.toggle('text-slate-600', !isPercent);
+        btnPercent.setAttribute('aria-pressed', isPercent);
+
+        btnFlat.classList.toggle('bg-indigo-600', !isPercent);
+        btnFlat.classList.toggle('text-white', !isPercent);
+        btnFlat.classList.toggle('shadow-sm', !isPercent);
+        btnFlat.classList.toggle('text-slate-600', isPercent);
+        btnFlat.setAttribute('aria-pressed', !isPercent);
+
+        discountPrefix.textContent = isPercent ? '%' : 'RM';
+        voucherDiscountEl.placeholder = isPercent ? '0' : '0.00';
+
+        updateCalculator();
+      }
+
+      [costPriceEl, sellingPriceEl, voucherDiscountEl].forEach(function (el) {
+        el.addEventListener('input', updateCalculator);
+      });
+
+      btnPercent.addEventListener('click', function () { setDiscountMode('percent'); });
+      btnFlat.addEventListener('click', function () { setDiscountMode('flat'); });
+
+      updateCalculator();
+    })();
+  </script>
+</body>
+</html>
