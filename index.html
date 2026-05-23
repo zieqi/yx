@@ -22,19 +22,41 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    html { overflow-x: hidden; }
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
-    input[type="number"] {
-      -moz-appearance: textfield;
+    input[type="number"] { -moz-appearance: textfield; }
+
+    .data-table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+    }
+    .data-table th,
+    .data-table td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .data-table-wrap {
+      -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 1279px) {
+      .data-table { font-size: 0.6875rem; }
+      .data-table th, .data-table td { padding: 0.375rem 0.25rem; }
+    }
+    @media (min-width: 1280px) {
+      .data-table { table-layout: auto; }
+      .data-table th, .data-table td { white-space: nowrap; }
     }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 font-sans text-slate-800 antialiased">
+<body class="min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 font-sans text-slate-800 antialiased">
 
-  <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
+  <div class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
 
     <header class="mb-8 text-center sm:mb-10">
       <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-slate-500 shadow-sm backdrop-blur">
@@ -61,9 +83,11 @@
 
         <div class="mb-6 rounded-xl border border-indigo-100 bg-indigo-50/60 px-4 py-3 text-sm text-indigo-900">
           <span class="font-semibold">Formula:</span>
-          Actual Cost = Cost × (1 − Voucher %)
-          &nbsp;→&nbsp;
-          Profit = Selling Price − Actual Cost
+          <span class="hidden lg:inline">Actual Cost = Cost × (1 − Voucher %) &nbsp;→&nbsp; Profit = Selling Price − Actual Cost</span>
+          <span class="lg:hidden">
+            <span class="mt-1 block">Actual Cost = Cost × (1 − Voucher %)</span>
+            <span class="mt-1 block">Profit = Selling Price − Actual Cost</span>
+          </span>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-2">
@@ -178,24 +202,26 @@
           Voucher Cheat Sheets
         </h2>
         <p class="mb-6 text-sm text-slate-500">
-          Left: profit at each voucher %. Right: voucher % needed to hit a target profit.
+          <span class="hidden xl:inline">Left: profit at each voucher %. Right: voucher % needed to hit a target profit.</span>
+          <span class="xl:hidden">Profit at each voucher %, and voucher % needed per target profit.</span>
         </p>
 
-        <div class="grid gap-6 xl:grid-cols-2">
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
 
           <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div class="border-b border-slate-100 bg-white px-4 py-3 sm:px-5">
               <h3 class="text-sm font-semibold text-slate-800">Percentage Voucher Matrix</h3>
               <p class="text-xs text-slate-400">18% to 30% off cost · Actual Cost = Cost × (1 − %)</p>
             </div>
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-[320px] text-left text-sm">
+            <div class="data-table-wrap overflow-x-auto">
+              <table class="data-table w-full min-w-0 text-left text-xs xl:min-w-[320px] xl:text-sm">
                 <thead>
-                  <tr class="border-b border-slate-100 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
-                    <th class="px-4 py-2.5 font-semibold sm:px-5">Voucher (%)</th>
-                    <th class="px-4 py-2.5 font-semibold sm:px-5">Actual Cost (RM)</th>
-                    <th class="px-4 py-2.5 font-semibold sm:px-5">Profit/Loss (RM)</th>
-                    <th class="px-4 py-2.5 font-semibold sm:px-5">Status</th>
+                  <tr class="border-b border-slate-100 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500 xl:text-xs">
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider"><span class="xl:hidden">Voucher</span><span class="hidden xl:inline">Voucher (%)</span></th>
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider"><span class="xl:hidden">Act.Cost</span><span class="hidden xl:inline">Actual Cost (RM)</span></th>
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider"><span class="xl:hidden">Profit</span><span class="hidden xl:inline">Profit/Loss (RM)</span></th>
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider"><span class="xl:hidden">Margin</span><span class="hidden xl:inline">Profit Margin (%)</span></th>
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody id="percentTableBody" class="divide-y divide-slate-50"></tbody>
@@ -208,14 +234,15 @@
               <h3 class="text-sm font-semibold text-slate-800">Target Profit → Voucher Matrix</h3>
               <p class="text-xs text-slate-400">RM 1 to RM 20 target profit · voucher % needed off cost</p>
             </div>
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-[320px] text-left text-sm">
+            <div class="data-table-wrap overflow-x-auto">
+              <table class="data-table w-full min-w-0 text-left text-xs xl:min-w-[320px] xl:text-sm">
                 <thead>
-                  <tr class="border-b border-slate-100 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
-                    <th class="px-4 py-2.5 font-semibold sm:px-5">Target Profit (RM)</th>
-                    <th class="px-4 py-2.5 font-semibold sm:px-5">Voucher Needed (%)</th>
-                    <th class="px-4 py-2.5 font-semibold sm:px-5">Actual Cost (RM)</th>
-                    <th class="px-4 py-2.5 font-semibold sm:px-5">Status</th>
+                  <tr class="border-b border-slate-100 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500 xl:text-xs">
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider"><span class="xl:hidden">Target</span><span class="hidden xl:inline">Target Profit (RM)</span></th>
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider"><span class="xl:hidden">Voucher</span><span class="hidden xl:inline">Voucher Needed (%)</span></th>
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider"><span class="xl:hidden">Act.Cost</span><span class="hidden xl:inline">Actual Cost (RM)</span></th>
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider"><span class="xl:hidden">Margin</span><span class="hidden xl:inline">Profit Margin (%)</span></th>
+                    <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5 xl:tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody id="targetProfitTableBody" class="divide-y divide-slate-50"></tbody>
@@ -228,7 +255,12 @@
     </main>
 
     <footer class="mt-8 text-center text-xs text-slate-400">
-      Actual Cost = Cost × (1 − Voucher %) &nbsp;·&nbsp; Profit = Selling Price − Actual Cost &nbsp;·&nbsp; Margin = (Profit ÷ Selling Price) × 100
+      <span class="hidden lg:inline">Actual Cost = Cost × (1 − Voucher %) &nbsp;·&nbsp; Profit = Selling Price − Actual Cost &nbsp;·&nbsp; Margin = (Profit ÷ Selling Price) × 100</span>
+      <span class="lg:hidden space-y-1 block">
+        <span class="block">Actual Cost = Cost × (1 − Voucher %)</span>
+        <span class="block">Profit = Selling Price − Actual Cost</span>
+        <span class="block">Margin = (Profit ÷ Selling Price) × 100</span>
+      </span>
     </footer>
   </div>
 
@@ -258,7 +290,34 @@
       }
 
       function fmtRM(amount) {
-        return 'RM ' + amount.toFixed(2);
+        return 'RM\u00a0' + amount.toFixed(2);
+      }
+
+      function isDesktopTable() {
+        return window.matchMedia('(min-width: 1280px)').matches;
+      }
+
+      function fmtTableRM(amount) {
+        return isDesktopTable() ? fmtRM(amount) : amount.toFixed(2);
+      }
+
+      function fmtTablePct(value) {
+        return isDesktopTable() ? value.toFixed(2) + '%' : value.toFixed(1) + '%';
+      }
+
+      function tableCellClass() {
+        return isDesktopTable()
+          ? 'px-4 py-2 tabular-nums sm:px-5'
+          : 'px-2 py-1.5 tabular-nums sm:px-3 sm:py-2';
+      }
+
+      function fmtMargin(profit, sellingPrice) {
+        if (sellingPrice <= 0) return '0.00%';
+        return ((profit / sellingPrice) * 100).toFixed(2) + '%';
+      }
+
+      function marginCellClass(profit) {
+        return profit > 0 ? 'text-emerald-600 font-medium' : profit < 0 ? 'text-red-800 font-medium' : 'text-slate-500';
       }
 
       function calcActualCost(costPrice, voucher, mode) {
@@ -278,9 +337,9 @@
 
       function statusBadge(isPass) {
         if (isPass) {
-          return '<span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Pass</span>';
+          return '<span class="inline-flex items-center rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20 xl:px-2.5 xl:text-xs">Pass</span>';
         }
-        return '<span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-800 ring-1 ring-inset ring-red-600/20">Fail</span>';
+        return '<span class="inline-flex items-center rounded-full bg-red-50 px-1.5 py-0.5 text-[10px] font-semibold text-red-800 ring-1 ring-inset ring-red-600/20 xl:px-2.5 xl:text-xs">Fail</span>';
       }
 
       function profitCellClass(profit) {
@@ -355,74 +414,89 @@
 
       function calcRequiredVoucher(costPrice, sellingPrice, targetProfit) {
         if (costPrice <= 0 || sellingPrice <= 0) {
-          return { pctNeeded: 0, actualCost: 0, pass: false, noVoucherNeeded: false };
+          return { pctNeeded: 0, actualCost: 0, profit: 0, margin: 0, pass: false, noVoucherNeeded: false };
         }
 
         const raw = costPrice - sellingPrice + targetProfit;
         const pctNeeded = (raw / costPrice) * 100;
+        const targetMargin = (targetProfit / sellingPrice) * 100;
 
         if (targetProfit > sellingPrice) {
-          return { pctNeeded, actualCost: 0, pass: false, noVoucherNeeded: false };
+          return { pctNeeded, actualCost: 0, profit: targetProfit, margin: targetMargin, pass: false, noVoucherNeeded: false };
         }
 
         if (raw <= 0) {
           const profitWithoutVoucher = sellingPrice - costPrice;
+          const marginWithoutVoucher = (profitWithoutVoucher / sellingPrice) * 100;
           return {
             pctNeeded: 0,
             actualCost: costPrice,
+            profit: profitWithoutVoucher,
+            margin: marginWithoutVoucher,
             pass: profitWithoutVoucher >= targetProfit,
             noVoucherNeeded: true,
           };
         }
 
         if (raw > costPrice) {
-          return { pctNeeded, actualCost: 0, pass: false, noVoucherNeeded: false };
+          return { pctNeeded, actualCost: 0, profit: targetProfit, margin: targetMargin, pass: false, noVoucherNeeded: false };
         }
 
         return {
           pctNeeded,
           actualCost: costPrice * (1 - pctNeeded / 100),
+          profit: targetProfit,
+          margin: targetMargin,
           pass: true,
           noVoucherNeeded: false,
         };
       }
 
       function buildPercentTable(costPrice, sellingPrice) {
+        const cell = tableCellClass();
         let rows = '';
         for (let pct = 18; pct <= 30; pct++) {
-          const { actualCost, profit } = calcProfit(sellingPrice, costPrice, pct, 'percent');
+          const { actualCost, profit, margin } = calcProfit(sellingPrice, costPrice, pct, 'percent');
           rows += '<tr class="hover:bg-slate-50/80 transition-colors">' +
-            '<td class="px-4 py-2 tabular-nums text-slate-700 sm:px-5">' + pct + '%</td>' +
-            '<td class="px-4 py-2 tabular-nums text-slate-700 sm:px-5">' + fmtRM(actualCost) + '</td>' +
-            '<td class="px-4 py-2 tabular-nums sm:px-5 ' + profitCellClass(profit) + '">' + fmtRM(profit) + '</td>' +
-            '<td class="px-4 py-2 sm:px-5">' + statusBadge(profit > 0) + '</td>' +
+            '<td class="' + cell + ' text-slate-700">' + pct + '%</td>' +
+            '<td class="' + cell + ' text-slate-700">' + fmtTableRM(actualCost) + '</td>' +
+            '<td class="' + cell + ' ' + profitCellClass(profit) + '">' + fmtTableRM(profit) + '</td>' +
+            '<td class="' + cell + ' ' + marginCellClass(profit) + '">' + fmtTablePct(margin) + '</td>' +
+            '<td class="' + cell + '">' + statusBadge(profit > 0) + '</td>' +
             '</tr>';
         }
         percentTableBody.innerHTML = rows;
       }
 
       function buildTargetProfitTable(costPrice, sellingPrice) {
+        const cell = tableCellClass();
         let rows = '';
         for (let target = 1; target <= 20; target++) {
           const result = calcRequiredVoucher(costPrice, sellingPrice, target);
           let voucherDisplay;
           if (result.noVoucherNeeded) {
-            voucherDisplay = '<span class="text-slate-400">None</span>';
+            voucherDisplay = '<span class="text-slate-400">' + (isDesktopTable() ? 'None' : '—') + '</span>';
           } else if (!result.pass) {
-            voucherDisplay = '<span class="text-red-800 font-medium">' + result.pctNeeded.toFixed(2) + '%</span>';
+            voucherDisplay = '<span class="text-red-800 font-medium">' + fmtTablePct(result.pctNeeded) + '</span>';
           } else {
-            voucherDisplay = '<span class="text-emerald-600 font-medium">' + result.pctNeeded.toFixed(2) + '%</span>';
+            voucherDisplay = '<span class="text-emerald-600 font-medium">' + fmtTablePct(result.pctNeeded) + '</span>';
           }
 
           const actualCostDisplay = result.pass || result.noVoucherNeeded
-            ? fmtRM(result.actualCost)
+            ? fmtTableRM(result.actualCost)
             : '<span class="text-slate-400">—</span>';
 
+          const marginClass = result.pass ? marginCellClass(result.profit) : 'text-red-800 font-medium';
+          const marginDisplay = '<span class="' + marginClass + '">' + fmtTablePct(result.margin) + '</span>';
+
+          const targetDisplay = isDesktopTable() ? fmtRM(target) : String(target);
+
           rows += '<tr class="hover:bg-slate-50/80 transition-colors">' +
-            '<td class="px-4 py-2 tabular-nums text-slate-700 sm:px-5">' + fmtRM(target) + '</td>' +
-            '<td class="px-4 py-2 tabular-nums sm:px-5">' + voucherDisplay + '</td>' +
-            '<td class="px-4 py-2 tabular-nums text-slate-700 sm:px-5">' + actualCostDisplay + '</td>' +
-            '<td class="px-4 py-2 sm:px-5">' + statusBadge(result.pass) + '</td>' +
+            '<td class="' + cell + ' text-slate-700">' + targetDisplay + '</td>' +
+            '<td class="' + cell + '">' + voucherDisplay + '</td>' +
+            '<td class="' + cell + ' text-slate-700">' + actualCostDisplay + '</td>' +
+            '<td class="' + cell + '">' + marginDisplay + '</td>' +
+            '<td class="' + cell + '">' + statusBadge(result.pass) + '</td>' +
             '</tr>';
         }
         targetProfitTableBody.innerHTML = rows;
@@ -474,6 +548,8 @@
 
       btnPercent.addEventListener('click', function () { setDiscountMode('percent'); });
       btnFlat.addEventListener('click', function () { setDiscountMode('flat'); });
+
+      window.addEventListener('resize', updateCalculator);
 
       updateCalculator();
     })();
