@@ -83,10 +83,10 @@
 
         <div class="mb-6 rounded-xl border border-indigo-100 bg-indigo-50/60 px-4 py-3 text-sm text-indigo-900">
           <span class="font-semibold">Formula:</span>
-          <span class="hidden lg:inline">Actual Cost = Cost × (1 − Voucher %) &nbsp;→&nbsp; Profit = Selling Price − Actual Cost</span>
+          <span class="hidden lg:inline">Voucher = min(Total Cost × %, Cap) &nbsp;→&nbsp; Profit = (Selling × Qty) − Actual Cost</span>
           <span class="lg:hidden">
-            <span class="mt-1 block">Actual Cost = Cost × (1 − Voucher %)</span>
-            <span class="mt-1 block">Profit = Selling Price − Actual Cost</span>
+            <span class="mt-1 block">Voucher = min(Total Cost × %, Cap)</span>
+            <span class="mt-1 block">Profit = (Selling × Qty) − Actual Cost</span>
           </span>
         </div>
 
@@ -108,25 +108,42 @@
                   class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-base font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
                 >
               </div>
-              <p class="mt-1 text-xs text-slate-400">Item cost (x) — voucher discount is applied here</p>
+              <p class="mt-1 text-xs text-slate-400">Per item cost — voucher discount is applied to total order cost</p>
             </div>
 
-            <div>
-              <label for="sellingPrice" class="mb-1.5 block text-sm font-medium text-slate-700">
-                Selling Price (RM)
-              </label>
-              <div class="relative">
-                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-medium text-slate-400">RM</span>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="quantity" class="mb-1.5 block text-sm font-medium text-slate-700">
+                  Quantity
+                </label>
                 <input
                   type="number"
-                  id="sellingPrice"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-base font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  id="quantity"
+                  min="1"
+                  step="1"
+                  value="1"
+                  placeholder="1"
+                  class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-base font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
                 >
+                <p class="mt-1 text-xs text-slate-400">How many items</p>
               </div>
-              <p class="mt-1 text-xs text-slate-400">Your Shopee listing price — no discount on this</p>
+              <div>
+                <label for="sellingPrice" class="mb-1.5 block text-sm font-medium text-slate-700">
+                  Selling Price (RM)
+                </label>
+                <div class="relative">
+                  <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-medium text-slate-400">RM</span>
+                  <input
+                    type="number"
+                    id="sellingPrice"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-base font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  >
+                </div>
+                <p class="mt-1 text-xs text-slate-400">Per item — no discount</p>
+              </div>
             </div>
 
             <div>
@@ -160,7 +177,25 @@
                   >RM</button>
                 </div>
               </div>
-              <p class="mt-1 text-xs text-slate-400">Test a voucher — reduces your cost, not the selling price</p>
+              <p class="mt-1 text-xs text-slate-400">Applied to total order cost, not selling price</p>
+            </div>
+
+            <div>
+              <label for="voucherCap" class="mb-1.5 block text-sm font-medium text-slate-700">
+                Voucher Cap (RM)
+              </label>
+              <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-medium text-slate-400">RM</span>
+                <input
+                  type="number"
+                  id="voucherCap"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-base font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                >
+              </div>
+              <p class="mt-1 text-xs text-slate-400">Max discount per voucher (e.g. 30% capped at RM 60). Leave 0 for no cap.</p>
             </div>
           </div>
 
@@ -169,23 +204,40 @@
               <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">Live Results</h3>
 
               <div class="space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                  <span class="text-sm text-slate-600">Actual Cost (RM)</span>
-                  <span id="actualCost" class="text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">RM 0.00</span>
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <span class="text-sm text-slate-600">Total Revenue (RM)</span>
+                  <span id="totalRevenue" class="text-lg font-bold tabular-nums text-slate-700 sm:text-xl">RM 0.00</span>
                 </div>
-                <p id="actualCostFormula" class="-mt-2 text-xs text-slate-400">Cost after voucher is applied</p>
+                <p class="-mt-2 text-xs text-slate-400">Selling Price × Quantity</p>
 
-                <div class="flex items-center justify-between border-b border-slate-100 pb-4 pt-1">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 pt-1">
+                  <span class="text-sm text-slate-600">Voucher Applied (RM)</span>
+                  <span id="voucherApplied" class="text-lg font-bold tabular-nums text-indigo-600 sm:text-xl">RM 0.00</span>
+                </div>
+                <p id="voucherAppliedNote" class="-mt-2 text-xs text-slate-400">Discount off total cost (after cap)</p>
+
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 pt-1">
+                  <span class="text-sm text-slate-600">Actual Cost (RM)</span>
+                  <span id="actualCost" class="text-lg font-bold tabular-nums text-slate-900 sm:text-xl">RM 0.00</span>
+                </div>
+                <p id="actualCostFormula" class="-mt-2 text-xs text-slate-400">Total cost after voucher</p>
+
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 pt-1">
                   <span class="text-sm text-slate-600">Net Profit / Loss (RM)</span>
                   <span id="netProfit" class="text-xl font-bold tabular-nums text-slate-400 sm:text-2xl">RM 0.00</span>
                 </div>
-                <p class="-mt-2 text-xs text-slate-400">Selling Price − Actual Cost</p>
+                <p class="-mt-2 text-xs text-slate-400">Total earnings for all items</p>
+
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 pt-1">
+                  <span class="text-sm text-slate-600">Profit Per Item (RM)</span>
+                  <span id="profitPerItem" class="text-lg font-bold tabular-nums text-slate-700 sm:text-xl">RM 0.00</span>
+                </div>
 
                 <div class="flex items-center justify-between pt-1">
                   <span class="text-sm text-slate-600">Profit Margin (%)</span>
                   <span id="profitMargin" class="text-xl font-bold tabular-nums text-slate-400 sm:text-2xl">0.00%</span>
                 </div>
-                <p class="-mt-2 text-xs text-slate-400">Based on your fixed selling price</p>
+                <p class="-mt-2 text-xs text-slate-400">Based on total revenue</p>
               </div>
 
               <div id="statusBanner" class="mt-5 hidden rounded-xl px-4 py-3 text-sm font-medium"></div>
@@ -211,7 +263,7 @@
           <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div class="border-b border-slate-100 bg-white px-4 py-3 sm:px-5">
               <h3 class="text-sm font-semibold text-slate-800">Percentage Voucher Matrix</h3>
-              <p class="text-xs text-slate-400">18% to 30% off cost · Actual Cost = Cost × (1 − %)</p>
+              <p class="text-xs text-slate-400">18%–30% · uses your qty &amp; cap · * = hit cap limit</p>
             </div>
             <div class="data-table-wrap overflow-x-auto">
               <table class="data-table w-full min-w-0 text-left text-xs xl:min-w-[320px] xl:text-sm">
@@ -232,7 +284,7 @@
           <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div class="border-b border-slate-100 bg-white px-4 py-3 sm:px-5">
               <h3 class="text-sm font-semibold text-slate-800">Target Profit → Voucher Matrix</h3>
-              <p class="text-xs text-slate-400">RM 1 to RM 20 target profit · voucher % needed off cost</p>
+              <p class="text-xs text-slate-400">Total profit RM 1–20 · uses qty &amp; cap</p>
             </div>
             <div class="data-table-wrap overflow-x-auto">
               <table class="data-table w-full min-w-0 text-left text-xs xl:min-w-[320px] xl:text-sm">
@@ -255,11 +307,11 @@
     </main>
 
     <footer class="mt-8 text-center text-xs text-slate-400">
-      <span class="hidden lg:inline">Actual Cost = Cost × (1 − Voucher %) &nbsp;·&nbsp; Profit = Selling Price − Actual Cost &nbsp;·&nbsp; Margin = (Profit ÷ Selling Price) × 100</span>
+      <span class="hidden lg:inline">Voucher = min(Total Cost × %, Cap) &nbsp;·&nbsp; Profit = (Selling × Qty) − Actual Cost &nbsp;·&nbsp; Margin = (Profit ÷ Total Revenue) × 100</span>
       <span class="lg:hidden space-y-1 block">
-        <span class="block">Actual Cost = Cost × (1 − Voucher %)</span>
-        <span class="block">Profit = Selling Price − Actual Cost</span>
-        <span class="block">Margin = (Profit ÷ Selling Price) × 100</span>
+        <span class="block">Voucher = min(Total Cost × %, Cap)</span>
+        <span class="block">Profit = (Selling × Qty) − Actual Cost</span>
+        <span class="block">Margin = (Profit ÷ Total Revenue) × 100</span>
       </span>
     </footer>
   </div>
@@ -270,13 +322,19 @@
 
       const costPriceEl = document.getElementById('costPrice');
       const sellingPriceEl = document.getElementById('sellingPrice');
+      const quantityEl = document.getElementById('quantity');
       const voucherDiscountEl = document.getElementById('voucherDiscount');
+      const voucherCapEl = document.getElementById('voucherCap');
       const btnPercent = document.getElementById('btnPercent');
       const btnFlat = document.getElementById('btnFlat');
       const discountPrefix = document.getElementById('discountPrefix');
+      const totalRevenueEl = document.getElementById('totalRevenue');
+      const voucherAppliedEl = document.getElementById('voucherApplied');
+      const voucherAppliedNoteEl = document.getElementById('voucherAppliedNote');
       const actualCostEl = document.getElementById('actualCost');
       const actualCostFormulaEl = document.getElementById('actualCostFormula');
       const netProfitEl = document.getElementById('netProfit');
+      const profitPerItemEl = document.getElementById('profitPerItem');
       const profitMarginEl = document.getElementById('profitMargin');
       const statusBanner = document.getElementById('statusBanner');
       const percentTableBody = document.getElementById('percentTableBody');
@@ -287,6 +345,11 @@
       function parseNum(value) {
         const n = parseFloat(value);
         return isNaN(n) ? 0 : Math.max(0, n);
+      }
+
+      function parseQty(value) {
+        const n = parseInt(value, 10);
+        return isNaN(n) || n < 1 ? 1 : n;
       }
 
       function fmtRM(amount) {
@@ -311,28 +374,52 @@
           : 'px-2 py-1.5 tabular-nums sm:px-3 sm:py-2';
       }
 
-      function fmtMargin(profit, sellingPrice) {
-        if (sellingPrice <= 0) return '0.00%';
-        return ((profit / sellingPrice) * 100).toFixed(2) + '%';
-      }
-
       function marginCellClass(profit) {
         return profit > 0 ? 'text-emerald-600 font-medium' : profit < 0 ? 'text-red-800 font-medium' : 'text-slate-500';
       }
 
-      function calcActualCost(costPrice, voucher, mode) {
+      function calcRawVoucher(totalCost, voucher, mode) {
+        if (totalCost <= 0) return 0;
         if (mode === 'percent') {
           const pct = Math.min(voucher, 100);
-          return Math.max(0, costPrice * (1 - pct / 100));
+          return totalCost * (pct / 100);
         }
-        return Math.max(0, costPrice - voucher);
+        return Math.min(voucher, totalCost);
       }
 
-      function calcProfit(sellingPrice, costPrice, voucher, mode) {
-        const actualCost = calcActualCost(costPrice, voucher, mode);
-        const profit = sellingPrice - actualCost;
-        const margin = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
-        return { actualCost, profit, margin };
+      function applyCap(rawDiscount, cap) {
+        const capped = cap > 0 ? Math.min(rawDiscount, cap) : rawDiscount;
+        return Math.max(0, capped);
+      }
+
+      function calcOrder(costPrice, sellingPrice, quantity, voucher, mode, cap) {
+        const qty = parseQty(quantity);
+        const totalCost = costPrice * qty;
+        const totalRevenue = sellingPrice * qty;
+        const rawVoucher = calcRawVoucher(totalCost, voucher, mode);
+        const voucherApplied = applyCap(rawVoucher, cap);
+        const actualTotalCost = Math.max(0, totalCost - voucherApplied);
+        const profit = totalRevenue - actualTotalCost;
+        const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
+        const profitPerItem = qty > 0 ? profit / qty : 0;
+        const capHit = cap > 0 && rawVoucher > cap;
+
+        return {
+          qty,
+          totalCost,
+          totalRevenue,
+          rawVoucher,
+          voucherApplied,
+          actualTotalCost,
+          profit,
+          margin,
+          profitPerItem,
+          capHit,
+        };
+      }
+
+      function calcProfitFromPct(costPrice, sellingPrice, quantity, pct, cap) {
+        return calcOrder(costPrice, sellingPrice, quantity, pct, 'percent', cap);
       }
 
       function statusBadge(isPass) {
@@ -349,88 +436,125 @@
       function setProfitColors(profit) {
         netProfitEl.classList.remove('text-emerald-600', 'text-red-800', 'text-slate-400');
         profitMarginEl.classList.remove('text-emerald-600', 'text-red-800', 'text-slate-400');
+        profitPerItemEl.classList.remove('text-emerald-600', 'text-red-800', 'text-slate-500');
 
         if (profit > 0) {
           netProfitEl.classList.add('text-emerald-600');
           profitMarginEl.classList.add('text-emerald-600');
+          profitPerItemEl.classList.add('text-emerald-600');
         } else if (profit < 0) {
           netProfitEl.classList.add('text-red-800');
           profitMarginEl.classList.add('text-red-800');
+          profitPerItemEl.classList.add('text-red-800');
         } else {
           netProfitEl.classList.add('text-slate-400');
           profitMarginEl.classList.add('text-slate-400');
+          profitPerItemEl.classList.add('text-slate-500');
         }
       }
 
-      function breakEvenVoucher(costPrice, sellingPrice) {
-        if (costPrice <= 0) return { pct: 0, flat: 0 };
-        const pct = sellingPrice >= costPrice ? 0 : ((1 - sellingPrice / costPrice) * 100);
-        const flat = Math.max(0, costPrice - sellingPrice);
-        return { pct: Math.min(100, Math.max(0, pct)), flat };
+      function breakEvenDiscount(totalCost, totalRevenue, cap) {
+        const rawNeeded = Math.max(0, totalCost - totalRevenue);
+        if (cap > 0 && rawNeeded > cap) {
+          return { rm: cap, pct: totalCost > 0 ? (cap / totalCost) * 100 : 0, capped: true };
+        }
+        return {
+          rm: rawNeeded,
+          pct: totalCost > 0 ? (rawNeeded / totalCost) * 100 : 0,
+          capped: false,
+        };
       }
 
-      function updateStatusBanner(profit, costPrice, sellingPrice, voucher, mode) {
+      function updateStatusBanner(order, costPrice, sellingPrice, cap) {
         if (costPrice <= 0 || sellingPrice <= 0) {
           statusBanner.classList.add('hidden');
           return;
         }
 
         statusBanner.classList.remove('hidden');
-        const be = breakEvenVoucher(costPrice, sellingPrice);
+        const be = breakEvenDiscount(order.totalCost, order.totalRevenue, cap);
+        const qtyLabel = order.qty > 1 ? ' (' + order.qty + ' items)' : '';
 
-        if (profit > 0) {
+        if (order.profit > 0) {
           statusBanner.className = 'mt-5 rounded-xl px-4 py-3 text-sm font-medium bg-emerald-50 text-emerald-800 border border-emerald-100';
-          if (sellingPrice >= costPrice) {
+          if (order.totalRevenue >= order.totalCost) {
             statusBanner.textContent =
-              'Profitable! Your selling price already exceeds cost. This voucher saves you even more.';
+              'Profitable' + qtyLabel + '! Revenue already exceeds total cost. Voucher saves you more.';
+          } else if (order.capHit) {
+            statusBanner.textContent =
+              'Profitable' + qtyLabel + ', but voucher is capped at ' + fmtRM(cap) + '. You earn ' + fmtRM(order.profit) + ' total.';
           } else {
             statusBanner.textContent =
-              'Profitable with this voucher. Minimum to break even: ' + be.pct.toFixed(2) + '% or RM ' + be.flat.toFixed(2) + ' off cost.';
+              'Profitable' + qtyLabel + '! Min discount to break even: ' + be.pct.toFixed(2) + '% or RM ' + be.rm.toFixed(2) + '.';
           }
-        } else if (profit < 0) {
+        } else if (order.profit < 0) {
           statusBanner.className = 'mt-5 rounded-xl px-4 py-3 text-sm font-medium bg-red-50 text-red-800 border border-red-100';
-          statusBanner.textContent =
-            'Loss at this voucher level. You need at least ' + be.pct.toFixed(2) + '% or RM ' + be.flat.toFixed(2) + ' off cost to break even.';
+          if (be.capped) {
+            statusBanner.textContent =
+              'Loss' + qtyLabel + '. Even max cap (' + fmtRM(cap) + ') is not enough to break even. Need RM ' + (order.totalCost - order.totalRevenue).toFixed(2) + ' off cost.';
+          } else {
+            statusBanner.textContent =
+              'Loss' + qtyLabel + '. Need at least ' + be.pct.toFixed(2) + '% or RM ' + be.rm.toFixed(2) + ' off total cost to break even.';
+          }
         } else {
           statusBanner.className = 'mt-5 rounded-xl px-4 py-3 text-sm font-medium bg-amber-50 text-amber-800 border border-amber-100';
-          statusBanner.textContent = 'Break-even — selling price equals actual cost after voucher.';
+          statusBanner.textContent = 'Break-even' + qtyLabel + ' — total revenue equals actual cost after voucher.';
         }
       }
 
-      function updateActualCostFormula(costPrice, voucher, mode) {
-        if (costPrice <= 0) {
-          actualCostFormulaEl.textContent = 'Cost after voucher is applied';
+      function updateActualCostFormula(order, voucher, mode, cap) {
+        if (order.totalCost <= 0) {
+          actualCostFormulaEl.textContent = 'Total cost after voucher';
+          return;
+        }
+        let line = fmtRM(order.totalCost) + ' − ' + fmtRM(order.voucherApplied) + ' = ' + fmtRM(order.actualTotalCost);
+        if (order.qty > 1) {
+          line = '(' + fmtRM(order.totalCost / order.qty) + ' × ' + order.qty + ') − ' + fmtRM(order.voucherApplied) + ' = ' + fmtRM(order.actualTotalCost);
+        }
+        actualCostFormulaEl.textContent = line;
+      }
+
+      function updateVoucherNote(order, voucher, mode, cap) {
+        if (order.totalCost <= 0) {
+          voucherAppliedNoteEl.textContent = 'Discount off total cost (after cap)';
           return;
         }
         if (mode === 'percent') {
           const pct = Math.min(voucher, 100);
-          actualCostFormulaEl.textContent =
-            fmtRM(costPrice) + ' × (1 − ' + pct.toFixed(2) + '%) = ' + fmtRM(calcActualCost(costPrice, voucher, mode));
+          let note = fmtRM(order.totalCost) + ' × ' + pct.toFixed(2) + '% = ' + fmtRM(order.rawVoucher);
+          if (order.capHit) {
+            note += ' → capped at ' + fmtRM(cap);
+          }
+          voucherAppliedNoteEl.textContent = note;
         } else {
-          actualCostFormulaEl.textContent =
-            fmtRM(costPrice) + ' − RM ' + voucher.toFixed(2) + ' = ' + fmtRM(calcActualCost(costPrice, voucher, mode));
+          voucherAppliedNoteEl.textContent = order.capHit
+            ? 'RM ' + voucher.toFixed(2) + ' requested → capped at ' + fmtRM(cap)
+            : 'Flat RM ' + voucher.toFixed(2) + ' off total cost';
         }
       }
 
-      function calcRequiredVoucher(costPrice, sellingPrice, targetProfit) {
-        if (costPrice <= 0 || sellingPrice <= 0) {
-          return { pctNeeded: 0, actualCost: 0, profit: 0, margin: 0, pass: false, noVoucherNeeded: false };
+      function calcRequiredVoucher(costPrice, sellingPrice, quantity, targetProfit, cap) {
+        const order = calcOrder(costPrice, sellingPrice, quantity, 0, 'percent', 0);
+        const { totalCost, totalRevenue } = order;
+
+        if (totalCost <= 0 || totalRevenue <= 0) {
+          return { pctNeeded: 0, actualTotalCost: 0, profit: 0, margin: 0, pass: false, noVoucherNeeded: false };
         }
 
-        const raw = costPrice - sellingPrice + targetProfit;
-        const pctNeeded = (raw / costPrice) * 100;
-        const targetMargin = (targetProfit / sellingPrice) * 100;
+        const rawNeeded = totalCost - totalRevenue + targetProfit;
+        const pctNeeded = totalCost > 0 ? (rawNeeded / totalCost) * 100 : 0;
+        const targetMargin = totalRevenue > 0 ? (targetProfit / totalRevenue) * 100 : 0;
 
-        if (targetProfit > sellingPrice) {
-          return { pctNeeded, actualCost: 0, profit: targetProfit, margin: targetMargin, pass: false, noVoucherNeeded: false };
+        if (targetProfit > totalRevenue) {
+          return { pctNeeded, actualTotalCost: 0, profit: targetProfit, margin: targetMargin, pass: false, noVoucherNeeded: false };
         }
 
-        if (raw <= 0) {
-          const profitWithoutVoucher = sellingPrice - costPrice;
-          const marginWithoutVoucher = (profitWithoutVoucher / sellingPrice) * 100;
+        if (rawNeeded <= 0) {
+          const profitWithoutVoucher = totalRevenue - totalCost;
+          const marginWithoutVoucher = totalRevenue > 0 ? (profitWithoutVoucher / totalRevenue) * 100 : 0;
           return {
             pctNeeded: 0,
-            actualCost: costPrice,
+            actualTotalCost: totalCost,
             profit: profitWithoutVoucher,
             margin: marginWithoutVoucher,
             pass: profitWithoutVoucher >= targetProfit,
@@ -438,13 +562,17 @@
           };
         }
 
-        if (raw > costPrice) {
-          return { pctNeeded, actualCost: 0, profit: targetProfit, margin: targetMargin, pass: false, noVoucherNeeded: false };
+        if (cap > 0 && rawNeeded > cap) {
+          return { pctNeeded, actualTotalCost: totalCost - cap, profit: targetProfit, margin: targetMargin, pass: false, noVoucherNeeded: false };
+        }
+
+        if (rawNeeded > totalCost) {
+          return { pctNeeded, actualTotalCost: 0, profit: targetProfit, margin: targetMargin, pass: false, noVoucherNeeded: false };
         }
 
         return {
           pctNeeded,
-          actualCost: costPrice * (1 - pctNeeded / 100),
+          actualTotalCost: totalCost - rawNeeded,
           profit: targetProfit,
           margin: targetMargin,
           pass: true,
@@ -452,27 +580,27 @@
         };
       }
 
-      function buildPercentTable(costPrice, sellingPrice) {
+      function buildPercentTable(costPrice, sellingPrice, quantity, cap) {
         const cell = tableCellClass();
         let rows = '';
         for (let pct = 18; pct <= 30; pct++) {
-          const { actualCost, profit, margin } = calcProfit(sellingPrice, costPrice, pct, 'percent');
+          const order = calcProfitFromPct(costPrice, sellingPrice, quantity, pct, cap);
           rows += '<tr class="hover:bg-slate-50/80 transition-colors">' +
-            '<td class="' + cell + ' text-slate-700">' + pct + '%</td>' +
-            '<td class="' + cell + ' text-slate-700">' + fmtTableRM(actualCost) + '</td>' +
-            '<td class="' + cell + ' ' + profitCellClass(profit) + '">' + fmtTableRM(profit) + '</td>' +
-            '<td class="' + cell + ' ' + marginCellClass(profit) + '">' + fmtTablePct(margin) + '</td>' +
-            '<td class="' + cell + '">' + statusBadge(profit > 0) + '</td>' +
+            '<td class="' + cell + ' text-slate-700">' + pct + '%' + (order.capHit ? '*' : '') + '</td>' +
+            '<td class="' + cell + ' text-slate-700">' + fmtTableRM(order.actualTotalCost) + '</td>' +
+            '<td class="' + cell + ' ' + profitCellClass(order.profit) + '">' + fmtTableRM(order.profit) + '</td>' +
+            '<td class="' + cell + ' ' + marginCellClass(order.profit) + '">' + fmtTablePct(order.margin) + '</td>' +
+            '<td class="' + cell + '">' + statusBadge(order.profit > 0) + '</td>' +
             '</tr>';
         }
         percentTableBody.innerHTML = rows;
       }
 
-      function buildTargetProfitTable(costPrice, sellingPrice) {
+      function buildTargetProfitTable(costPrice, sellingPrice, quantity, cap) {
         const cell = tableCellClass();
         let rows = '';
         for (let target = 1; target <= 20; target++) {
-          const result = calcRequiredVoucher(costPrice, sellingPrice, target);
+          const result = calcRequiredVoucher(costPrice, sellingPrice, quantity, target, cap);
           let voucherDisplay;
           if (result.noVoucherNeeded) {
             voucherDisplay = '<span class="text-slate-400">' + (isDesktopTable() ? 'None' : '—') + '</span>';
@@ -483,7 +611,7 @@
           }
 
           const actualCostDisplay = result.pass || result.noVoucherNeeded
-            ? fmtTableRM(result.actualCost)
+            ? fmtTableRM(result.actualTotalCost)
             : '<span class="text-slate-400">—</span>';
 
           const marginClass = result.pass ? marginCellClass(result.profit) : 'text-red-800 font-medium';
@@ -505,19 +633,25 @@
       function updateCalculator() {
         const costPrice = parseNum(costPriceEl.value);
         const sellingPrice = parseNum(sellingPriceEl.value);
+        const quantity = parseQty(quantityEl.value);
         const voucher = parseNum(voucherDiscountEl.value);
+        const cap = parseNum(voucherCapEl.value);
 
-        const { actualCost, profit, margin } = calcProfit(sellingPrice, costPrice, voucher, discountMode);
+        const order = calcOrder(costPrice, sellingPrice, quantity, voucher, discountMode, cap);
 
-        actualCostEl.textContent = fmtRM(actualCost);
-        netProfitEl.textContent = fmtRM(profit);
-        profitMarginEl.textContent = margin.toFixed(2) + '%';
+        totalRevenueEl.textContent = fmtRM(order.totalRevenue);
+        voucherAppliedEl.textContent = fmtRM(order.voucherApplied);
+        actualCostEl.textContent = fmtRM(order.actualTotalCost);
+        netProfitEl.textContent = fmtRM(order.profit);
+        profitPerItemEl.textContent = fmtRM(order.profitPerItem);
+        profitMarginEl.textContent = order.margin.toFixed(2) + '%';
 
-        updateActualCostFormula(costPrice, voucher, discountMode);
-        setProfitColors(profit);
-        updateStatusBanner(profit, costPrice, sellingPrice, voucher, discountMode);
-        buildPercentTable(costPrice, sellingPrice);
-        buildTargetProfitTable(costPrice, sellingPrice);
+        updateVoucherNote(order, voucher, discountMode, cap);
+        updateActualCostFormula(order, voucher, discountMode, cap);
+        setProfitColors(order.profit);
+        updateStatusBanner(order, costPrice, sellingPrice, cap);
+        buildPercentTable(costPrice, sellingPrice, quantity, cap);
+        buildTargetProfitTable(costPrice, sellingPrice, quantity, cap);
       }
 
       function setDiscountMode(mode) {
@@ -542,7 +676,7 @@
         updateCalculator();
       }
 
-      [costPriceEl, sellingPriceEl, voucherDiscountEl].forEach(function (el) {
+      [costPriceEl, sellingPriceEl, quantityEl, voucherDiscountEl, voucherCapEl].forEach(function (el) {
         el.addEventListener('input', updateCalculator);
       });
 
