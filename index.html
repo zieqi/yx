@@ -273,31 +273,10 @@
           </div>
         </div>
 
-        <div id="optimumInsight" class="mb-5 hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"></div>
-
-        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div class="border-b border-slate-100 px-4 py-3 sm:px-5">
-            <h3 class="text-sm font-semibold text-slate-800">Quantity Comparison</h3>
-            <p id="optimumTableNote" class="text-xs text-slate-400">Uses your voucher %, cap &amp; selling price</p>
-          </div>
-          <div class="data-table-wrap overflow-x-auto">
-            <table class="data-table w-full min-w-0 text-left text-xs xl:text-sm">
-              <thead>
-                <tr class="border-b border-slate-100 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500 xl:text-xs">
-                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5">Qty</th>
-                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5"><span class="xl:hidden">Voucher</span><span class="hidden xl:inline">Voucher (RM)</span></th>
-                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5"><span class="xl:hidden">Total</span><span class="hidden xl:inline">Total Profit (RM)</span></th>
-                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5"><span class="xl:hidden">/ Item</span><span class="hidden xl:inline">Profit / Item (RM)</span></th>
-                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5">Cap?</th>
-                </tr>
-              </thead>
-              <tbody id="optimumTableBody" class="divide-y divide-slate-50"></tbody>
-            </table>
-          </div>
-        </div>
+        <div id="optimumInsight" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"></div>
       </section>
 
-      <section class="bg-slate-50/50 p-6 sm:p-8">
+      <section class="border-b border-slate-100 bg-slate-50/50 p-6 sm:p-8">
         <h2 class="mb-2 flex items-center gap-2 text-lg font-semibold text-slate-900">
           <svg class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -353,6 +332,27 @@
             </div>
           </div>
 
+        </div>
+      </section>
+
+      <section class="bg-white p-6 sm:p-8">
+        <h2 class="mb-2 text-lg font-semibold text-slate-900">Quantity Comparison</h2>
+        <p id="optimumTableNote" class="mb-4 text-sm text-slate-500">Uses your voucher %, cap &amp; selling price</p>
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div class="data-table-wrap overflow-x-auto">
+            <table class="data-table w-full min-w-0 text-left text-xs xl:text-sm">
+              <thead>
+                <tr class="border-b border-slate-100 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500 xl:text-xs">
+                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5">Qty</th>
+                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5"><span class="xl:hidden">Voucher</span><span class="hidden xl:inline">Voucher (RM)</span></th>
+                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5"><span class="xl:hidden">Total</span><span class="hidden xl:inline">Total Profit (RM)</span></th>
+                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5"><span class="xl:hidden">/ Item</span><span class="hidden xl:inline">Profit / Item (RM)</span></th>
+                  <th class="px-2 py-2 font-semibold xl:px-4 xl:py-2.5">Cap?</th>
+                </tr>
+              </thead>
+              <tbody id="optimumTableBody" class="divide-y divide-slate-50"></tbody>
+            </table>
+          </div>
         </div>
       </section>
     </main>
